@@ -76,11 +76,12 @@
             border-radius: 15px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.15);
             border: 3px solid #8e44ad;
+            transition: all 0.3s ease;
         }
 
         .target-image:hover {
-            transform: scale(1.02);
-            transition: transform 0.3s ease;
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
         }
 
         .prompt-section {
@@ -143,15 +144,33 @@
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-transform: uppercase;
             letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #8e44ad, #9b59b6, #bb6bd9);
             color: white;
             box-shadow: 0 4px 15px rgba(142,68,173,0.3);
+            transform: perspective(1px) translateZ(0);
         }
 
         .btn-secondary {
@@ -160,8 +179,13 @@
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(142, 68, 173, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(-1px) scale(1.02);
+            transition: all 0.1s ease;
         }
 
         .btn:disabled {
@@ -176,47 +200,6 @@
             box-shadow: 0 4px 15px rgba(142, 68, 173, 0.1);
         }
 
-        .result-section {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            display: none;
-        }
-
-        .result-section.show {
-            display: block;
-            animation: slideUp 0.5s ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .score-display {
-            font-size: 3em;
-            font-weight: bold;
-            color: #8e44ad;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: #e9ecef;
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #8e44ad, #9b59b6, #bb6bd9);
-            width: 0%;
-            transition: width 1s ease;
-        }
-
         .level-info {
             background: linear-gradient(135deg, #f8f0ff, #f3e5f5);
             border: 2px solid #bb6bd9;
@@ -224,6 +207,149 @@
             border-radius: 10px;
             margin-bottom: 20px;
             text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .level-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(187, 107, 217, 0.2);
+        }
+
+        /* מודל פופ אפ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            animation: fadeInOverlay 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 3px solid #8e44ad;
+        }
+
+        @keyframes modalSlideIn {
+            from { 
+                transform: scale(0.7) translateY(-50px);
+                opacity: 0;
+            }
+            to { 
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-score {
+            font-size: 4em;
+            font-weight: bold;
+            color: #8e44ad;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .modal-progress {
+            width: 100%;
+            height: 15px;
+            background: #e9ecef;
+            border-radius: 7px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .modal-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8e44ad, #9b59b6, #bb6bd9);
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 2px 8px rgba(142, 68, 173, 0.3);
+        }
+
+        .modal-feedback {
+            background: #f8f0ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #8e44ad;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .modal-btn:hover::before {
+            left: 100%;
+        }
+
+        .modal-btn-improve {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .modal-btn-next {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         }
 
         @media (max-width: 768px) {
@@ -243,7 +369,16 @@
             
             .btn {
                 padding: 12px 20px;
-                font-size: 18px;
+                font-size: 16px;
+            }
+
+            .modal {
+                padding: 20px;
+                margin: 20px;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
             }
         }
     </style>
@@ -253,14 +388,10 @@
         <div class="header">
             <h1>🎯 דייק את הפרומפט</h1>
             <p>
-
-   הביטו בתמונה ונסחו פרומפט שיצור תמונה דומה ככל האפשר.
+הביטו בתמונה ונסחו פרומפט שיצור תמונה דומה ככל האפשר.
 לחצו על "בדוק פרומפט" ובדקו כמה הצלחתם.
 שפרו את הפרומפט עד שתגיעו לתוצאה הרצויה. 😊
             </p>
-          
-          
-    
             <div class="score-board">
                 <div class="score-item">
                     <strong>ציון: <span id="current-score">0</span></strong>
@@ -280,8 +411,7 @@
                     <h3 id="challenge-title">אתגר 1: חתול חמוד</h3>
                     <p id="challenge-description">כתבו פרומפט שיצור את התמונה</p>
                 </div>
-                <img id="target-image" src="https://lomdot.education.gov.il/cet/datainformation/cat.jpg" style="width: 400px;
-                 height:300px;" alt="תמונת אתגר" class="target-image">
+                <img id="target-image" src="https://lomdot.education.gov.il/cet/datainformation/cat.jpg" style="width: 400px; height:300px;" alt="תמונת אתגר" class="target-image">
             </div>
 
             <div class="prompt-section">
@@ -302,14 +432,27 @@
                     <button class="btn btn-secondary" onclick="prevChallenge()" id="prev-btn">הקודם ⏭️</button>
                     <button class="btn btn-primary" onclick="nextChallenge()" id="next-btn">הבא ⏮️</button>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="result-section" id="result-section">
-                    <div class="score-display" id="score-display">85</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill"></div>
-                    </div>
-                    <p id="feedback-text">מצוין! הפרומפט שלך מדויק וכולל פרטים חשובים.</p>
-                </div>
+    <!-- מודל פופ אפ -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-score" id="modal-score">85</div>
+            <div class="modal-progress">
+                <div class="modal-progress-fill" id="modal-progress-fill"></div>
+            </div>
+            <div class="modal-feedback" id="modal-feedback">
+                מצוין! הפרומפט שלך מדויק וכולל פרטים חשובים.
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-improve" onclick="closeModal()">
+                    שפר את הפרומפט 🔧
+                </button>
+                <button class="modal-btn modal-btn-next" onclick="nextChallengeFromModal()">
+                    לאתגר הבא ➡️
+                </button>
             </div>
         </div>
     </div>
@@ -380,14 +523,12 @@
                 title: "אתגר 10: כלב חמוד",
                 description: "נסה לנחש מה רואים בתמונה",
                 image: "https://lomdot.education.gov.il/cet/datainformation/dog.jpg.jpg",
-                
                 keywords: ["כלב", "לבן", "זנב", "אוזניים", "חמוד" ,"כתומים"]
             },
             {
                 title: "אתגר 11: לילה עם כוכבים",
                 description: "נסה לנחש מה רואים בתמונה",
                image: " https://lomdot.education.gov.il/cet/datainformation/Stars.jpg",
-                
                 keywords: ["לילה", "כוכבים", "ירח", "שמיים", "כהה", "חושך"]
             }
         ];
@@ -405,7 +546,6 @@
                 document.getElementById('challenge-description').textContent = "כתבו פרומפט שיצור את התמונה";
                 document.getElementById('target-image').src = challenge.image;
                 document.getElementById('prompt-input').value = '';
-                document.getElementById('result-section').classList.remove('show');
                 currentTip = 1;
                 showCurrentTip();
                 
@@ -495,22 +635,47 @@
             
             currentScore += result.score;
             
-            document.getElementById('score-display').textContent = result.score;
-            document.getElementById('feedback-text').textContent = result.feedback;
-            document.getElementById('progress-fill').style.width = result.score + '%';
-            document.getElementById('result-section').classList.add('show');
+            // הצגת המודל עם התוצאות
+            showModal(result);
             
             updateDisplay();
+        }
 
+        function showModal(result) {
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalScore = document.getElementById('modal-score');
+            const modalFeedback = document.getElementById('modal-feedback');
+            const modalProgressFill = document.getElementById('modal-progress-fill');
+
+            modalScore.textContent = result.score;
+            modalFeedback.textContent = result.feedback;
+            
+            modalOverlay.classList.add('show');
+
+            // אנימציה של הפרוגרס בר
+            setTimeout(() => {
+                modalProgressFill.style.width = result.score + '%';
+            }, 300);
+
+            // צבע הציון בהתאם לרמה
             setTimeout(() => {
                 if (result.score >= 80) {
-                    document.getElementById('score-display').style.color = '#28a745';
+                    modalScore.style.color = '#28a745';
                 } else if (result.score >= 60) {
-                    document.getElementById('score-display').style.color = '#ffc107';
+                    modalScore.style.color = '#ffc107';
                 } else {
-                    document.getElementById('score-display').style.color = '#dc3545';
+                    modalScore.style.color = '#dc3545';
                 }
             }, 500);
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('show');
+        }
+
+        function nextChallengeFromModal() {
+            closeModal();
+            nextChallenge();
         }
 
         function nextChallenge() {
@@ -532,16 +697,27 @@
             }
         }
 
+        // סגירת המודל בלחיצה על הרקע
+        document.getElementById('modal-overlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // סגירת המודל במקש Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+            if (e.ctrlKey && e.key === 'Enter') {
+                submitPrompt();
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             console.log(`נטענו ${challenges.length} אתגרים`);
             loadChallenge();
             updateDisplay();
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'Enter') {
-                submitPrompt();
-            }
         });
     </script>
 </body>
