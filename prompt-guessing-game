@@ -467,7 +467,7 @@
         const challenges = [
             {
                
-              title: "אתגר 1: חתול חמוד",
+                title: "אתגר 1: חתול חמוד",
                 description: "נסה לנחש מה רואים בתמונה",
                 image: "https://lomdot.education.gov.il/cet/datainformation/cat.jpg",
                 keywords: ["חתול", "כתום", "כיסא", "יושב"]
@@ -494,7 +494,7 @@
                 title: "אתגר 5: בית קטן",
                 description: "נסה לנחש מה רואים בתמונה",
                 image: "https://lomdot.education.gov.il/cet/datainformation/house.jpg",
-                keywords: ["בית", "גג", "חלון", "חלונות", "דשא", "דלת"]
+                keywords: ["בית", "גג", "חלון", "חלונות", "חצר", "דלת"]
             },
             {
                 title: "אתגר 6: רכב ספורט",
@@ -530,13 +530,8 @@
                 title: "אתגר 11: לילה עם כוכבים",
                 description: "נסה לנחש מה רואים בתמונה",
                image: " https://lomdot.education.gov.il/cet/datainformation/Stars.jpg",
-                keywords: ["לילה", "כוכבים", "ירח", "שמיים", "כהה", "חושך"]
-            }    
-
-
-
-
-
+                keywords: ["לילה", "כוכבים", "עצים", "שמיים", "כהה", "חושך"]
+            }
         ];
 
         function updateDisplay() {
@@ -575,16 +570,19 @@
                 
                 // עדכון כפתור הבא בהתאם לאתגר
                 if (currentLevel >= challenges.length) {
-                    // האתגר האחרון
-                    nextBtn.innerHTML = 'התחל מחדש 🔄';
-                    nextBtn.className = 'btn btn-secondary';
-                    nextBtn.onclick = resetGame;
+                    // האתגר האחרון - כפתור "סיום" שמקפיץ את הודעת הסיום
+                    nextBtn.innerHTML = 'סיום 🏁';
+                    nextBtn.className = 'btn btn-primary';
+                    nextBtn.onclick = showFinalMessage;
                 } else {
                     // לא האתגר האחרון
                     nextBtn.innerHTML = 'הבא ⏮️';
                     nextBtn.className = 'btn btn-primary';
                     nextBtn.onclick = nextChallenge;
                 }
+                
+                // עדכון התצוגה לוודא שהרמה נכונה
+                updateDisplay();
             }
         }
 
@@ -737,6 +735,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             console.log(`נטענו ${challenges.length} אתגרים`);
+            console.log('רשימת כל האתגרים:', challenges.map((c, i) => `${i+1}: ${c.title}`));
             loadChallenge();
             updateDisplay();
         });
