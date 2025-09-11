@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק דייק את הפרומפט</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d1b69 0%, #5b2c87 25%, #8e44ad 50%, #9b59b6 75%, #af7ac5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(45, 27, 105, 0.3);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #5a3bc6, #7c4dff, #ab47bc);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .score-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 25px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .main-content {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 35px;
+            align-items: start;
+        }
+
+        .image-section {
+            text-align: center;
+        }
+
+        .target-image {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            border: 3px solid #8e44ad;
+        }
+
+        .target-image:hover {
+            transform: scale(1.02);
+            transition: transform 0.3s ease;
+        }
+
+        .prompt-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px dashed #8e44ad;
+        }
+
+        .prompt-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 18px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .prompt-input:focus {
+            outline: none;
+            border-color: #8e44ad;
+            box-shadow: 0 0 0 3px rgba(142,68,173,0.1);
+        }
+
+        .tips-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f3e5f5;
+            border-radius: 10px;
+            border-left: 4px solid #9c27b0;
+        }
+
+        .tip {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tip.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6, #bb6bd9);
+            color: white;
+            box-shadow: 0 4px 15px rgba(142,68,173,0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 15px rgba(142, 68, 173, 0.1);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .score-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #8e44ad;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8e44ad, #9b59b6, #bb6bd9);
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .level-info {
+            background: linear-gradient(135deg, #f8f0ff, #f3e5f5);
+            border: 2px solid #bb6bd9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .score-board {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🎯 דייק את הפרומפט</h1>
+            <p>
+
+   הביטו בתמונה ונסחו פרומפט שיצור תמונה דומה ככל האפשר.
+לחצו על "בדוק פרומפט" ובדקו כמה הצלחתם.
+שפרו את הפרומפט עד שתגיעו לתוצאה הרצויה. 😊
+            </p>
+          
+          
+    
+            <div class="score-board">
+                <div class="score-item">
+                    <strong>ציון: <span id="current-score">0</span></strong>
+                </div>
+                <div class="score-item">
+                    <strong>שלב: <span id="current-level">1</span></strong>
+                </div>
+                <div class="score-item">
+                    <strong>ניסיונות: <span id="attempts">0</span></strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="image-section">
+                <div class="level-info">
+                    <h3 id="challenge-title">אתגר 1: חתול חמוד</h3>
+                    <p id="challenge-description">כתבו פרומפט שיצור את התמונה</p>
+                </div>
+                <img id="target-image" src="https://lomdot.education.gov.il/cet/datainformation/cat.jpg" style="width: 400px;
+                 height:300px;" alt="תמונת אתגר" class="target-image">
+            </div>
+
+            <div class="prompt-section">
+                <h3>✍️ כתוב את הפרומפט שלך:</h3>
+                <textarea id="prompt-input" class="prompt-input" placeholder="לדוגמה: חתול כתום גדול יושב על כיסא חום, סגנון מציאותי, תאורה טבעית..."></textarea>
+                
+                <div class="tips-section">
+                    <h4>💡 טיפ מועיל:</h4>
+                    <div class="tip active" id="tip-1">התחל עם הנושא העיקרי - מה רואים בתמונה?</div>
+                    <div class="tip" id="tip-2">הוסף פרטים על צבעים, גדלים ומיקום</div>
+                    <div class="tip" id="tip-3">תאר את הסגנון - מציאותי? אנימציה? אמנות?</div>
+                    <div class="tip" id="tip-4">הוסף פרטי תאורה ורקע לתוצאה טובה יותר</div>
+                </div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" onclick="submitPrompt()">בדוק פרומפט 🚀</button>
+                    <button class="btn btn-primary" onclick="showTip()">טיפ נוסף 💡</button>
+                    <button class="btn btn-secondary" onclick="prevChallenge()" id="prev-btn">הקודם ⏭️</button>
+                    <button class="btn btn-primary" onclick="nextChallenge()" id="next-btn">הבא ⏮️</button>
+                </div>
+
+                <div class="result-section" id="result-section">
+                    <div class="score-display" id="score-display">85</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <p id="feedback-text">מצוין! הפרומפט שלך מדויק וכולל פרטים חשובים.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLevel = 1;
+        let currentScore = 0;
+        let attempts = 0;
+        let currentTip = 1;
+        let hasMovedNext = false;
+
+        const challenges = [
+            {
+                title: "אתגר 1: חתול חמוד",
+                description: "נסה לנחש מה רואים בתמונה",
+                image: "https://lomdot.education.gov.il/cet/datainformation/cat.jpg",
+                keywords: ["חתול", "כתום", "כיסא", "יושב"]
+            },
+            {
+                title: "אתגר 2: נוף הרים",
+                description: "נסה לנחש מה רואים בתמונה",
+                image: "https://lomdot.education.gov.il/cet/datainformation/sedimentation.jpg.jpg",
+                keywords: ["הרים", "שקיעה", "שמש", "נוף", "כתום", "צהוב"]
+            },
+            {
+                title: "אתגר 3: רובוט עתידני",
+                description: "נסה לנחש מה רואים בתמונה",
+                image: "https://lomdot.education.gov.il/cet/datainformation/robot.jpg.jpg",
+                keywords: ["רובוט", "כחול", "עיניים", "זוהר", "עתידני", "מכונה"]
+            },
+            {
+                title: "אתגר 4: פרח צבעוני",
+                description: "נסה לנחש מה רואים בתמונה",
+                image: " https://lomdot.education.gov.il/cet/datainformation/flower.jpg",
+                keywords: ["פרח", "אדום", "עלים", "ירוק", "גבעול"]
+            },
+            {
+                title: "אתגר 5: בית קטן",
+                description: "נסה לנחש מה רואים בתמונה",
+                image: "https://lomdot.education.gov.il/cet/datainformation/house.jpg",
+                keywords: ["בית", "גג", "אדום", "חלונות", "כחול", "דלת"]
+            },
+            {
+                title: "אתגר 6: רכב ספורט",
+                description: "נסה לנחש מה רואים בתמונה",
+                image: "https://lomdot.education.gov.il/cet/datainformation/vehicle.jpg.jpg",
+                keywords: ["מכונית", "ספורט", "אדום", "מהיר", "רכב", "גלגלים"]
+            },
+            {
+                title: "אתגר 7: דג צבעוני",
+                description: "נסה לנחש מה רואים בתמונה",
+                image: "https://lomdot.education.gov.il/cet/datainformation/fish.jpg",
+                keywords: ["דג", "טרופי", "צבעוני", "מים", "כחול", "זנב", "סנפירים"]
+            },
+            {
+                title: "אתגר 8: פרפר צבעוני",
+                description: "נסה לנחש מה רואים בתמונה",
+                image: "https://lomdot.education.gov.il/cet/datainformation/butterfly.jpg.jpg",
+                keywords: ["פרפר", "כנפיים", "צהוב", "בחוץ", "גבעול"]
+            },
+            {
+                title: "אתגר 9: עץ גדול",
+                description: "נסה לנחש מה רואים בתמונה",
+               image: "https://lomdot.education.gov.il/cet/datainformation/tree.jpg.jpg",
+                keywords: ["עץ", "גבוה", "עלים", "ירוק", "גזע", "חום"]
+            },
+            {
+                title: "אתגר 10: כלב חמוד",
+                description: "נסה לנחש מה רואים בתמונה",
+                image: "https://lomdot.education.gov.il/cet/datainformation/dog.jpg.jpg",
+                
+                keywords: ["כלב", "לבן", "זנב", "אוזניים", "חמוד" ,"כתומים"]
+            },
+            {
+                title: "אתגר 11: לילה עם כוכבים",
+                description: "נסה לנחש מה רואים בתמונה",
+               image: " https://lomdot.education.gov.il/cet/datainformation/Stars.jpg",
+                
+                keywords: ["לילה", "כוכבים", "ירח", "שמיים", "כהה", "חושך"]
+            }
+        ];
+
+        function updateDisplay() {
+            document.getElementById('current-score').textContent = currentScore;
+            document.getElementById('current-level').textContent = `${currentLevel}/${challenges.length}`;
+            document.getElementById('attempts').textContent = attempts;
+        }
+
+        function loadChallenge() {
+            const challenge = challenges[currentLevel - 1];
+            if (challenge) {
+                document.getElementById('challenge-title').textContent = challenge.title;
+                document.getElementById('challenge-description').textContent = "כתבו פרומפט שיצור את התמונה";
+                document.getElementById('target-image').src = challenge.image;
+                document.getElementById('prompt-input').value = '';
+                document.getElementById('result-section').classList.remove('show');
+                currentTip = 1;
+                showCurrentTip();
+                
+                // עדכון כפתורים
+                const prevBtn = document.getElementById('prev-btn');
+                if (currentLevel <= 1) {
+                    prevBtn.style.opacity = '0.5';
+                    prevBtn.disabled = true;
+                    prevBtn.className = 'btn btn-secondary';
+                } else {
+                    prevBtn.style.opacity = '1';
+                    prevBtn.disabled = false;
+                    if (hasMovedNext) {
+                        prevBtn.className = 'btn btn-primary';
+                    } else {
+                        prevBtn.className = 'btn btn-secondary';
+                    }
+                }
+            }
+        }
+
+        function showCurrentTip() {
+            document.querySelectorAll('.tip').forEach(tip => tip.classList.remove('active'));
+            const tip = document.getElementById(`tip-${currentTip}`);
+            if (tip) {
+                tip.classList.add('active');
+            }
+        }
+
+        function showTip() {
+            currentTip = (currentTip % 4) + 1;
+            showCurrentTip();
+        }
+
+        function analyzePrompt(prompt) {
+            const challenge = challenges[currentLevel - 1];
+            let score = 0;
+            let feedback = [];
+
+            const words = prompt.toLowerCase();
+            let matchedKeywords = 0;
+
+            challenge.keywords.forEach(keyword => {
+                if (words.includes(keyword.toLowerCase())) {
+                    matchedKeywords++;
+                    score += 15;
+                }
+            });
+
+            if (prompt.length > 20) score += 10;
+            if (prompt.length > 50) score += 10;
+            if (words.includes('צבע') || words.includes('צבעים')) score += 5;
+            if (words.includes('תאורה') || words.includes('אור')) score += 5;
+            if (words.includes('רקע')) score += 5;
+
+            if (matchedKeywords === challenge.keywords.length) {
+                feedback.push("🎯 זיהית את כל האלמנטים העיקריים!");
+                score += 20;
+            } else if (matchedKeywords > challenge.keywords.length / 2) {
+                feedback.push("👍 זיהית רוב האלמנטים החשובים");
+            } else {
+                feedback.push("💡 נסה להוסיף פרטים נוספים על מה שרואים בתמונה");
+            }
+
+            if (prompt.length < 20) {
+                feedback.push("📝 הפרומפט קצר מידי - הוסף יותר פרטים");
+            } else if (prompt.length > 100) {
+                feedback.push("✨ פרומפט מפורט ועשיר!");
+                score += 10;
+            }
+
+            return {
+                score: Math.min(score, 100),
+                feedback: feedback.join('\n')
+            };
+        }
+
+        function submitPrompt() {
+            const prompt = document.getElementById('prompt-input').value.trim();
+            if (!prompt) {
+                alert('אנא כתוב פרומפט לפני השליחה!');
+                return;
+            }
+
+            attempts++;
+            const result = analyzePrompt(prompt);
+            
+            currentScore += result.score;
+            
+            document.getElementById('score-display').textContent = result.score;
+            document.getElementById('feedback-text').textContent = result.feedback;
+            document.getElementById('progress-fill').style.width = result.score + '%';
+            document.getElementById('result-section').classList.add('show');
+            
+            updateDisplay();
+
+            setTimeout(() => {
+                if (result.score >= 80) {
+                    document.getElementById('score-display').style.color = '#28a745';
+                } else if (result.score >= 60) {
+                    document.getElementById('score-display').style.color = '#ffc107';
+                } else {
+                    document.getElementById('score-display').style.color = '#dc3545';
+                }
+            }, 500);
+        }
+
+        function nextChallenge() {
+            if (currentLevel < challenges.length) {
+                currentLevel++;
+                hasMovedNext = true;
+                loadChallenge();
+                updateDisplay();
+            } else {
+                alert(`🎉 סיימת את כל האתגרים!\nציון סופי: ${currentScore}\nמספר ניסיונות: ${attempts}\n\nיש ${challenges.length} אתגרים במשחק!`);
+            }
+        }
+
+        function prevChallenge() {
+            if (currentLevel > 1) {
+                currentLevel--;
+                loadChallenge();
+                updateDisplay();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log(`נטענו ${challenges.length} אתגרים`);
+            loadChallenge();
+            updateDisplay();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                submitPrompt();
+            }
+        });
+    </script>
+</body>
+</html>
