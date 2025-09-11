@@ -466,7 +466,8 @@
 
         const challenges = [
             {
-                title: "אתגר 1: חתול חמוד",
+               
+              title: "אתגר 1: חתול חמוד",
                 description: "נסה לנחש מה רואים בתמונה",
                 image: "https://lomdot.education.gov.il/cet/datainformation/cat.jpg",
                 keywords: ["חתול", "כתום", "כיסא", "יושב"]
@@ -481,19 +482,19 @@
                 title: "אתגר 3: רובוט עתידני",
                 description: "נסה לנחש מה רואים בתמונה",
                 image: "https://lomdot.education.gov.il/cet/datainformation/robot.jpg.jpg",
-                keywords: ["רובוט", "כחול", "עיניים", "זוהר", "עתידני", "מכונה"]
+                keywords: ["רובוט", "צהוב", "עיניים", "שעון", "יושב", "מכונה"]
             },
             {
                 title: "אתגר 4: פרח צבעוני",
                 description: "נסה לנחש מה רואים בתמונה",
                 image: " https://lomdot.education.gov.il/cet/datainformation/flower.jpg",
-                keywords: ["פרח", "אדום", "עלים", "ירוק", "גבעול"]
+                keywords: ["פרח", "ורוד", "עלי", "כותרת", "צהוב"]
             },
             {
                 title: "אתגר 5: בית קטן",
                 description: "נסה לנחש מה רואים בתמונה",
                 image: "https://lomdot.education.gov.il/cet/datainformation/house.jpg",
-                keywords: ["בית", "גג", "אדום", "חלונות", "כחול", "דלת"]
+                keywords: ["בית", "גג", "חלון", "חלונות", "דשא", "דלת"]
             },
             {
                 title: "אתגר 6: רכב ספורט",
@@ -505,7 +506,7 @@
                 title: "אתגר 7: דג צבעוני",
                 description: "נסה לנחש מה רואים בתמונה",
                 image: "https://lomdot.education.gov.il/cet/datainformation/fish.jpg",
-                keywords: ["דג", "טרופי", "צבעוני", "מים", "כחול", "זנב", "סנפירים"]
+                keywords: ["דג", "אלמוגים", "כחול", "מים", "כחול", "זנב", "סנפירים"]
             },
             {
                 title: "אתגר 8: פרפר צבעוני",
@@ -530,7 +531,12 @@
                 description: "נסה לנחש מה רואים בתמונה",
                image: " https://lomdot.education.gov.il/cet/datainformation/Stars.jpg",
                 keywords: ["לילה", "כוכבים", "ירח", "שמיים", "כהה", "חושך"]
-            }
+            }    
+
+
+
+
+
         ];
 
         function updateDisplay() {
@@ -551,6 +557,8 @@
                 
                 // עדכון כפתורים
                 const prevBtn = document.getElementById('prev-btn');
+                const nextBtn = document.getElementById('next-btn');
+                
                 if (currentLevel <= 1) {
                     prevBtn.style.opacity = '0.5';
                     prevBtn.disabled = true;
@@ -563,6 +571,19 @@
                     } else {
                         prevBtn.className = 'btn btn-secondary';
                     }
+                }
+                
+                // עדכון כפתור הבא בהתאם לאתגר
+                if (currentLevel >= challenges.length) {
+                    // האתגר האחרון
+                    nextBtn.innerHTML = 'התחל מחדש 🔄';
+                    nextBtn.className = 'btn btn-secondary';
+                    nextBtn.onclick = resetGame;
+                } else {
+                    // לא האתגר האחרון
+                    nextBtn.innerHTML = 'הבא ⏮️';
+                    nextBtn.className = 'btn btn-primary';
+                    nextBtn.onclick = nextChallenge;
                 }
             }
         }
