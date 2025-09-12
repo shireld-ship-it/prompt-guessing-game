@@ -466,7 +466,7 @@
 
         const challenges = [
             {
-               
+          
                 title: "אתגר 1: חתול חמוד",
                 description: "נסה לנחש מה רואים בתמונה",
                 image: "https://lomdot.education.gov.il/cet/datainformation/cat.jpg",
@@ -580,9 +580,6 @@
                     nextBtn.className = 'btn btn-primary';
                     nextBtn.onclick = nextChallenge;
                 }
-                
-                // עדכון התצוגה לוודא שהרמה נכונה
-                updateDisplay();
             }
         }
 
@@ -735,7 +732,6 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             console.log(`נטענו ${challenges.length} אתגרים`);
-            console.log('רשימת כל האתגרים:', challenges.map((c, i) => `${i+1}: ${c.title}`));
             loadChallenge();
             updateDisplay();
         });
