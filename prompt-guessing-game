@@ -478,7 +478,7 @@
 
         const challenges = [
             {
-               
+            
                 title: "אתגר 1: חתול חמוד",
                 description: "נסה לנחש מה רואים בתמונה",
                 image: "https://lomdot.education.gov.il/cet/datainformation/cat.jpg",
@@ -729,9 +729,12 @@
                 message += `💪 התחלה טובה! המשך להתרגל וכישוריך ישתפרו!`;
             }
             
-            message += `\n\nרוצה לשחק שוב? רענן את הדף להתחלה חדשה! 🔄`;
+            message += `\n\nרוצה לשחק שוב? 🔄`;
             
-            alert(message);
+            const playAgain = confirm(message);
+            if (playAgain) {
+                location.reload();
+            }
         }
 
         function closeModal() {
