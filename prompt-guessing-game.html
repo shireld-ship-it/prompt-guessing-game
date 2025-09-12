@@ -178,6 +178,12 @@
             color: white;
         }
 
+        .btn-finish {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
         .btn:hover {
             transform: translateY(-3px) scale(1.05);
             box-shadow: 0 8px 25px rgba(142, 68, 173, 0.5);
@@ -347,6 +353,12 @@
             box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
         }
 
+        .modal-btn-finish {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
         .modal-btn:hover {
             transform: translateY(-2px) scale(1.05);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
@@ -450,7 +462,7 @@
                 <button class="modal-btn modal-btn-improve" onclick="closeModal()">
                     שפר את הפרומפט 🔧
                 </button>
-                <button class="modal-btn modal-btn-next" onclick="nextChallengeFromModal()">
+                <button class="modal-btn modal-btn-next" id="modal-next-btn" onclick="nextChallengeFromModal()">
                     לאתגר הבא ➡️
                 </button>
             </div>
@@ -466,7 +478,7 @@
 
         const challenges = [
             {
-          
+               
                 title: "אתגר 1: חתול חמוד",
                 description: "נסה לנחש מה רואים בתמונה",
                 image: "https://lomdot.education.gov.il/cet/datainformation/cat.jpg",
@@ -570,9 +582,9 @@
                 
                 // עדכון כפתור הבא בהתאם לאתגר
                 if (currentLevel >= challenges.length) {
-                    // האתגר האחרון - כפתור "סיום" שמקפיץ את הודעת הסיום
+                    // האתגר האחרון - כפתור "סיום"
                     nextBtn.innerHTML = 'סיום 🏁';
-                    nextBtn.className = 'btn btn-primary';
+                    nextBtn.className = 'btn btn-finish';
                     nextBtn.onclick = showFinalMessage;
                 } else {
                     // לא האתגר האחרון
@@ -662,9 +674,21 @@
             const modalScore = document.getElementById('modal-score');
             const modalFeedback = document.getElementById('modal-feedback');
             const modalProgressFill = document.getElementById('modal-progress-fill');
+            const modalNextBtn = document.getElementById('modal-next-btn');
 
             modalScore.textContent = result.score;
             modalFeedback.textContent = result.feedback;
+            
+            // עדכון כפתור במודל בהתאם לאתגר
+            if (currentLevel >= challenges.length) {
+                modalNextBtn.innerHTML = 'סיום המשחק 🏆';
+                modalNextBtn.className = 'modal-btn modal-btn-finish';
+                modalNextBtn.onclick = showFinalMessage;
+            } else {
+                modalNextBtn.innerHTML = 'לאתגר הבא ➡️';
+                modalNextBtn.className = 'modal-btn modal-btn-next';
+                modalNextBtn.onclick = nextChallengeFromModal;
+            }
             
             modalOverlay.classList.add('show');
 
@@ -685,6 +709,31 @@
             }, 500);
         }
 
+        function showFinalMessage() {
+            closeModal();
+            const averageScore = Math.round(currentScore / attempts);
+            const totalPossibleScore = challenges.length * 100;
+            const percentage = Math.round((currentScore / totalPossibleScore) * 100);
+            
+            let message = `🎉 כל הכבוד! סיימת את המשחק! 🎉\n\n`;
+            message += `📊 סיכום הביצועים שלך:\n`;
+            message += `🎯 ציון כולל: ${currentScore}\n`;
+            message += `🎮 מספר ניסיונות: ${attempts}\n`;
+           
+            
+            if (percentage >= 80) {
+                message += `🌟 מדהים! אתה מומחה בכתיבת פרומפטים! 🌟`;
+            } else if (percentage >= 60) {
+                message += `👏 יפה מאוד! יש לך יכולות טובות בכתיבת פרומפטים!`;
+            } else {
+                message += `💪 התחלה טובה! המשך להתרגל וכישוריך ישתפרו!`;
+            }
+            
+            message += `\n\nרוצה לשחק שוב? רענן את הדף להתחלה חדשה! 🔄`;
+            
+            alert(message);
+        }
+
         function closeModal() {
             document.getElementById('modal-overlay').classList.remove('show');
         }
@@ -701,7 +750,7 @@
                 loadChallenge();
                 updateDisplay();
             } else {
-                alert(`🎉 סיימת את כל האתגרים!\nציון סופי: ${currentScore}\nמספר ניסיונות: ${attempts}\n\nיש ${challenges.length} אתגרים במשחק!`);
+                showFinalMessage();
             }
         }
 
