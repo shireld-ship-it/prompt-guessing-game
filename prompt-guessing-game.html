@@ -406,7 +406,7 @@
             </p>
             <div class="score-board">
                 <div class="score-item">
-                    <strong>ציון: <span id="current-score">0</span></strong>
+                    <strong>הציון הטוב: <span id="current-score">0</span></strong>
                 </div>
                 <div class="score-item">
                     <strong>שלב: <span id="current-level">1</span></strong>
@@ -471,14 +471,14 @@
 
     <script>
         let currentLevel = 1;
-        let currentScore = 0;
         let attempts = 0;
         let currentTip = 1;
         let hasMovedNext = false;
+        let levelScores = {}; // אובייקט שישמור את כל הציונים לכל שלב
+        let levelAttempts = {}; // מספר הניסיונות לכל שלב
 
         const challenges = [
             {
-            
                 title: "אתגר 1: חתול חמוד",
                 description: "נסה לנחש מה רואים בתמונה",
                 image: "https://lomdot.education.gov.il/cet/datainformation/cat.jpg",
@@ -547,14 +547,26 @@
         ];
 
         function updateDisplay() {
-            document.getElementById('current-score').textContent = currentScore;
+            // חישוב הציון הגבוה ביותר בשלב הנוכחי
+            let bestScore = 0;
+            if (levelScores[currentLevel] && levelScores[currentLevel].length > 0) {
+                bestScore = Math.max(...levelScores[currentLevel]);
+            }
+            
+            document.getElementById('current-score').textContent = bestScore;
             document.getElementById('current-level').textContent = `${currentLevel}/${challenges.length}`;
-            document.getElementById('attempts').textContent = attempts;
+            document.getElementById('attempts').textContent = levelAttempts[currentLevel] || 0;
         }
 
         function loadChallenge() {
             const challenge = challenges[currentLevel - 1];
             if (challenge) {
+                // אתחול ציונים לשלב הנוכחי אם לא קיימים
+                if (!levelScores[currentLevel]) {
+                    levelScores[currentLevel] = [];
+                    levelAttempts[currentLevel] = 0;
+                }
+                
                 document.getElementById('challenge-title').textContent = challenge.title;
                 document.getElementById('challenge-description').textContent = "כתבו פרומפט שיצור את התמונה";
                 document.getElementById('target-image').src = challenge.image;
@@ -659,9 +671,11 @@
             }
 
             attempts++;
+            levelAttempts[currentLevel]++;
             const result = analyzePrompt(prompt);
             
-            currentScore += result.score;
+            // שמירת הציון של הניסיון הזה בשלב הנוכחי
+            levelScores[currentLevel].push(result.score);
             
             // הצגת המודל עם התוצאות
             showModal(result);
@@ -711,15 +725,31 @@
 
         function showFinalMessage() {
             closeModal();
-            const averageScore = Math.round(currentScore / attempts);
-            const totalPossibleScore = challenges.length * 100;
-            const percentage = Math.round((currentScore / totalPossibleScore) * 100);
+            
+            // חישוב הציון הגבוה ביותר לכל שלב וסיכום הכולל
+            let totalSum = 0;
+            let completedLevels = 0;
+            let detailedResults = '';
+            
+            for (let level = 1; level <= challenges.length; level++) {
+                if (levelScores[level] && levelScores[level].length > 0) {
+                    const bestScore = Math.max(...levelScores[level]); // הציון הגבוה ביותר בשלב
+                    totalSum += bestScore; // סכום הציונים הטובים ביותר של כל השלבים
+                    completedLevels++;
+                    detailedResults += `🎯 שלב ${level}: ${levelAttempts[level]} ניסיונות, ציון טוב ביותר: ${bestScore}\n`;
+                }
+            }
             
             let message = `🎉 כל הכבוד! סיימת את המשחק! 🎉\n\n`;
-            message += `📊 סיכום הביצועים שלך:\n`;
-            message += `🎯 ציון כולל: ${currentScore}\n`;
-            message += `🎮 מספר ניסיונות: ${attempts}\n`;
-           
+            message += `📊 סיכום  של הביצועים:\n\n`;
+            message += detailedResults;
+            message += `\n🏆 תוצאות כלליות:\n`;
+            message += `📈 ציון כולל: ${totalSum}\n`;
+            message += `🎮 סה"כ ניסיונות: ${attempts}\n`;
+            message += `✅ שלבים שהושלמו: ${completedLevels}/${challenges.length}\n\n`;
+            
+            const maxPossibleScore = completedLevels * 100;
+            const percentage = Math.round((totalSum / maxPossibleScore) * 100);
             
             if (percentage >= 80) {
                 message += `🌟 מדהים! אתה מומחה בכתיבת פרומפטים! 🌟`;
@@ -729,7 +759,7 @@
                 message += `💪 התחלה טובה! המשך להתרגל וכישוריך ישתפרו!`;
             }
             
-            message += `\n\nרוצים לשחק שוב? לחצו על כפתור אישור 🔄`;
+            message += `\n\nרוצה לשחק שוב? 🔄`;
             
             const playAgain = confirm(message);
             if (playAgain) {
@@ -784,10 +814,16 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             console.log(`נטענו ${challenges.length} אתגרים`);
+            // אתחול מערכי הציונים והניסיונות לכל שלב
+            levelScores = {};
+            levelAttempts = {};
+            for (let i = 1; i <= challenges.length; i++) {
+                levelScores[i] = [];
+                levelAttempts[i] = 0;
+            }
             loadChallenge();
             updateDisplay();
         });
     </script>
 </body>
 </html>
-
